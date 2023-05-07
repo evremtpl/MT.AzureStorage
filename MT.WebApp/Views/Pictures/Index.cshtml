@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+@section Scripts
+    {
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(() => {
+            var connection = new signalR.HubConnectionBuilder().withUrl("/NotificationHub").build();
+
+            connection.start().then(() => {
+
+                console.log("Hub Connection Id:" + connection.connectionId)
+            });
+
+            connection.on("NotifyCompleteWritingProcess", () => {
+
+                $("#status").html(`The Process of adding writing to your images.<a  href="/pictures/ShowWritingImages">   Click to see your processed images.</a>`);
+
+            })
+
+            var pictures = new Array();
+
+            var UserId = "@ViewBag.UserId";
+            var City = "@ViewBag.City";
+
+            $("#AddWriting").click(() => {
+
+                let pictureWritingQueue = {
+                    "UserId": UserId, "City": City, "ConnectionId": connection.connectionId, "WritingText": $("#writingText").val(), "Pictures": pictures
+                };
+
+                $.post("/Pictures/AddWriting", pictureWritingQueue, (data) => {
+
+                    $("#status").text("Writing  is being added to your images.");
+                })
+
+            })
+
+            $("#images img").click(function () {
+
+                $(this).css("border", "3px solid red");
+
+                pictures.push($(this).attr("data-name"));
+
+                console.log(pictures);
+            })
+
+        })
+    </script>
+
+}
+
+<div class="row">
+    <div class="col-md-8  offset-md-2">
+
+        <form class="form-inline" asp-action="Index" method="post" enctype="multipart/form-data">
+
+            <input type="file" name="pictures" multiple />
+            <input class="btn btn-primary" type="submit" value="Add Picture" />
+        </form>
+
+        <div class="form-inline mt-3">
+
+            <input class="form-control" type="text" id="writingText" />
+            <button class=" btn btn-warning ml-1" id="AddWriting">Add Writing</button>
+        </div>
+        <h2 id="status"></h2>
+        <h2>Pictures</h2>
+        <div id="images">
+            @foreach (var item in ViewBag.fileBlobs as List<FileBlob>)
+            {
+                <img style="width:200px;" data-name="@item.Name" src="@item.Url" />
+            }
+        </div>
+    </div>
+</div>
