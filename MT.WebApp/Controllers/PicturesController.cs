@@ -7,7 +7,9 @@ using MT.WebApp.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -109,9 +111,25 @@ namespace MT.WebApp.Controllers
 
             var jsonStringBase64=Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonString));
 
-            AzQueue azQueue = new AzQueue("textimagequeue");
+            // to get AzureQueue Object by Reflection
+            Assembly disAssembly = Assembly.Load("MT.AzureStorageLib");
+            var azQueueType = disAssembly.GetType($"{disAssembly.GetName().Name}.Services.Concrete.AzQueue");
 
-           await azQueue.SendMessageAsync(jsonStringBase64);
+            var azQueue = Activator.CreateInstance(azQueueType, new object[] { "textimagequeue" });
+            await (Task)azQueueType.GetTypeInfo()
+              .GetDeclaredMethod("SendMessageAsync")
+              .Invoke(azQueue, new object[] { $"{jsonStringBase64}" });
+
+
+
+
+
+
+
+
+
+            //AzQueue azQueue = new AzQueue("textimagequeue");
+            // await azQueue.SendMessageAsync(jsonStringBase64);
 
             return Ok();
         }

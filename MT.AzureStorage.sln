@@ -7,9 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MT.AzureStorageLib", "MT.Az
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MT.WebApp", "MT.WebApp\MT.WebApp.csproj", "{C9F0A999-25AD-4652-AF14-CA932851C89E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MT.WritingProcessFunc", "MT.WritingProcessFunc\MT.WritingProcessFunc.csproj", "{5AFA4371-1A60-4AE4-952C-76BEFF5E3B0E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MT.AzureProcessFunction", "MT.AzureProcessFunction\MT.AzureProcessFunction.csproj", "{07347D79-65AD-428D-9136-4B34D40EFB85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MT.AzureProcessFunction", "MT.AzureProcessFunction\MT.AzureProcessFunction.csproj", "{07347D79-65AD-428D-9136-4B34D40EFB85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +23,6 @@ Global
 		{C9F0A999-25AD-4652-AF14-CA932851C89E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9F0A999-25AD-4652-AF14-CA932851C89E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9F0A999-25AD-4652-AF14-CA932851C89E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AFA4371-1A60-4AE4-952C-76BEFF5E3B0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AFA4371-1A60-4AE4-952C-76BEFF5E3B0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AFA4371-1A60-4AE4-952C-76BEFF5E3B0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5AFA4371-1A60-4AE4-952C-76BEFF5E3B0E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{07347D79-65AD-428D-9136-4B34D40EFB85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{07347D79-65AD-428D-9136-4B34D40EFB85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07347D79-65AD-428D-9136-4B34D40EFB85}.Release|Any CPU.ActiveCfg = Release|Any CPU
