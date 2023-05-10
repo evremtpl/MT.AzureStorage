@@ -19,19 +19,22 @@ namespace MT.AzureProcessFunction
         public async static  Task Run([QueueTrigger("textimagequeue", Connection = "mtaccountconn")] PictureWritingQueue myQueueItem, ILogger log)
         {
             //burayı reflection yap
-            ConnectionString.AzureStorageConnectionString = @"Your azure conn";
+            ConnectionString.AzureStorageConnectionString = @"Your azure account string";
             IBlobStorage blobStorage = new BlobStorage();
 
             TableStorage<UserPicture> noSqlStorage = new TableStorage<UserPicture>();
-            foreach (var item in myQueueItem.Pictures)
+            try
             {
-                using var stream = await blobStorage.DownloadAsync(item, EContainerName.pictures);//blob storageden normal resim alındı.
-                using var memoryStream = AddWriting(myQueueItem.WritingText, stream); //writin  e gönder yazısı eklensin.
+                for (int i = 0; i < myQueueItem.Pictures.Count; i++)
+                {
+                    using var stream = await blobStorage.DownloadAsync(myQueueItem.Pictures[i], EContainerName.pictures);//blob storageden normal resim alındı.
+                    using var memoryStream = AddWriting(myQueueItem.WritingText, stream); //writin  e gönder yazısı eklensin.
 
-                await blobStorage.UploadAsync(memoryStream, item, EContainerName.writingpictures);
+                    await blobStorage.UploadAsync(memoryStream, myQueueItem.Pictures[i], EContainerName.writingpictures);
 
-                log.LogInformation($"Writing was added to {item}.");
+                    log.LogInformation($"Writing was added to {myQueueItem.Pictures[i]}.");
 
+                }
                 var userPicture = await noSqlStorage.GetAsync(myQueueItem.UserId, myQueueItem.City);
 
                 if (userPicture.WritingRawPaths != null)
@@ -39,26 +42,23 @@ namespace MT.AzureProcessFunction
                     myQueueItem.Pictures.AddRange(userPicture.WritingPaths);
                 }
                 userPicture.WritingPaths = myQueueItem.Pictures;
-                await noSqlStorage.AddAsync(userPicture);
+                await noSqlStorage.UpdateAsync(userPicture);
 
                 // Process tamamlandı. Notification Hub a bildirim gönderiliyor.
                 HttpClient httpClient = new HttpClient();
                 HttpResponseMessage response;
-                try
-                {
-                     response = await httpClient.GetAsync("http://localhost:10760/api/Notification/CompleteWritingProcess/" + myQueueItem.connectionId);
+             
+                    response = await httpClient.GetAsync("http://localhost:10760/api/Notification/CompleteWritingProcess/" + myQueueItem.connectionId);
 
-                    log.LogInformation($" Client {response.StatusCode } {response.Content} was informed.");
+                    log.LogInformation($" Client {response.StatusCode} {response.Content} was informed.");
                     log.LogInformation($" Client {myQueueItem.connectionId} was informed.");
-                }
-                catch (Exception ex)
-                {
 
-                    log.LogInformation($" hataaaa {ex.Message} ");
-                }
-                
-                
             }
+            catch (Exception ex)
+            {
+                log.LogInformation($" hata {ex.Message} ");
+            }
+       
     }
 
 
@@ -74,10 +74,10 @@ namespace MT.AzureProcessFunction
                     {
                         gph.DrawImage(image, 0, 0);
                         var font = new Font(FontFamily.GenericSansSerif, 25, FontStyle.Bold);
-                        var color = Color.FromArgb(252, 0, 0);
+                        var color = Color.FromArgb(237, 0, 0);
 
                         var brush = new SolidBrush(color);
-                        var point = new Point(20, image.Height - 50);
+                        var point = new Point(50, image.Height - 150);
                         gph.DrawString(writingText, font, brush, point);
 
                         tempBitmap.Save(ms, ImageFormat.Png);

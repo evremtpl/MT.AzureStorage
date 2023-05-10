@@ -91,11 +91,29 @@ namespace MT.WebApp.Controllers
         {
             List<FileBlob> fileBlobs = new List<FileBlob>();
             UserPicture userPicture = await _noSqlStorage.GetAsync(UserId, City);
+            var Blobs = _blobStorage.GetNames(EContainerName.writingpictures);
 
-            userPicture.WritingPaths.ForEach(x =>
+            if (Blobs.Any())
             {
-                fileBlobs.Add(new FileBlob { Name = x, Url = $"{_blobStorage.BlobUrl}/{EContainerName.writingpictures}/{x}" });
-            });
+                foreach (var blob in Blobs)
+                {
+                    if(userPicture.WritingPaths.Contains(blob))
+                    {
+                        fileBlobs.Add(new FileBlob { Name = blob, Url = $"{_blobStorage.BlobUrl}/{EContainerName.writingpictures}/{blob}" });
+                    }
+                }
+                
+                    userPicture.WritingPaths.ForEach(x =>
+                    {
+                        if (Blobs.Contains(x))
+                        {
+                           
+                        }
+                       
+                    });
+             
+            }
+           
 
             ViewBag.fileBlobs = fileBlobs;
 
@@ -107,22 +125,24 @@ namespace MT.WebApp.Controllers
         public async Task<IActionResult> AddWriting( PictureWritingQueue pictureWritingQueue)
         
         {
-            var jsonString=JsonConvert.SerializeObject(pictureWritingQueue);
+            if (pictureWritingQueue.Pictures != null)
+            {
+                var jsonString = JsonConvert.SerializeObject(pictureWritingQueue);
 
-            var jsonStringBase64=Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonString));
+                var jsonStringBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonString));
 
-            // to get AzureQueue Object by Reflection
-            Assembly disAssembly = Assembly.Load("MT.AzureStorageLib");
-            var azQueueType = disAssembly.GetType($"{disAssembly.GetName().Name}.Services.Concrete.AzQueue");
+                // to get AzureQueue Object by Reflection
+                Assembly disAssembly = Assembly.Load("MT.AzureStorageLib");
+                var azQueueType = disAssembly.GetType($"{disAssembly.GetName().Name}.Services.Concrete.AzQueue");
 
-            var azQueue = Activator.CreateInstance(azQueueType, new object[] { "textimagequeue" });
-            await (Task)azQueueType.GetTypeInfo()
-              .GetDeclaredMethod("SendMessageAsync")
-              .Invoke(azQueue, new object[] { $"{jsonStringBase64}" });
+                var azQueue = Activator.CreateInstance(azQueueType, new object[] { "textimagequeue" });
+                await (Task)azQueueType.GetTypeInfo()
+                  .GetDeclaredMethod("SendMessageAsync")
+                  .Invoke(azQueue, new object[] { $"{jsonStringBase64}" });
 
-
-
-
+                return Ok("Writing  is being added to your images.");
+            }
+            else { return Ok("You didnt pick any image"); }
 
 
 
@@ -131,7 +151,7 @@ namespace MT.WebApp.Controllers
             //AzQueue azQueue = new AzQueue("textimagequeue");
             // await azQueue.SendMessageAsync(jsonStringBase64);
 
-            return Ok();
+          
         }
     }
 }

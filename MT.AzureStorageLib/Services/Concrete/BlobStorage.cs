@@ -69,14 +69,25 @@ namespace MT.AzureStorageLib.Services.Concrete
         {
             List<string> blobNames = new List<string>();
 
-            var containerClient = _blobServiceClient.GetBlobContainerClient(eContainerName.ToString());
-
-            var blobs = containerClient.GetBlobs();
-
-            blobs.ToList().ForEach(x =>
+            try
             {
-                blobNames.Add(x.Name);
-            });
+                var containerClient = _blobServiceClient.GetBlobContainerClient(eContainerName.ToString());
+
+                var blobs = containerClient.GetBlobs();
+
+                blobs.ToList().ForEach(x =>
+                {
+                    blobNames.Add(x.Name);
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return blobNames;
+            }
+           
+
+          
 
             return blobNames;
         }
