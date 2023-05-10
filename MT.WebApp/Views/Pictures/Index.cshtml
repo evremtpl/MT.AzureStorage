@@ -32,8 +32,8 @@
                 };
 
                 $.post("/Pictures/AddWriting", pictureWritingQueue, (data) => {
-
-                    $("#status").text("Writing  is being added to your images.");
+                    console.log(`merveee${data}`);
+                    $("#status").text(data);
                 })
 
             })
