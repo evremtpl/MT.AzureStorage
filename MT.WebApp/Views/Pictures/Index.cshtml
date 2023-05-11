@@ -32,7 +32,7 @@
                 };
 
                 $.post("/Pictures/AddWriting", pictureWritingQueue, (data) => {
-                    console.log(`merveee${data}`);
+                    console.log(`${data}`);
                     $("#status").text(data);
                 })
 
