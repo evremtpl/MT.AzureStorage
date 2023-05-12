@@ -42,10 +42,19 @@ namespace MT.WebApp.Controllers
 
             if (user != null)
             {
-                user.Paths?.ForEach(x =>
+                var Blobs = _blobStorage.GetNames(EContainerName.pictures);
+
+                if (Blobs.Any())
                 {
-                    fileBlobs.Add(new FileBlob { Name = x, Url = $"{_blobStorage.BlobUrl}/{EContainerName.pictures}/{x}" });
-                });
+
+                    foreach (var blob in Blobs)
+                    {
+                        if (user.Paths.Contains(blob))
+                        {
+                          fileBlobs.Add(new FileBlob { Name = blob, Url = $"{_blobStorage.BlobUrl}/{EContainerName.pictures}/{blob}" });
+                        }
+                    }
+                }
             }
             ViewBag.fileBlobs = fileBlobs;
             return View();
@@ -68,7 +77,7 @@ namespace MT.WebApp.Controllers
 
             if (isUser != null)
             {
-                if(isUser.Paths!=null) picturesList.AddRange(isUser.Paths);
+                if (isUser.Paths != null) picturesList.AddRange(isUser.Paths);
 
                 isUser.Paths = picturesList;
             }
@@ -97,23 +106,23 @@ namespace MT.WebApp.Controllers
             {
                 foreach (var blob in Blobs)
                 {
-                    if(userPicture.WritingPaths.Contains(blob))
+                    if (userPicture.WritingPaths.Contains(blob))
                     {
                         fileBlobs.Add(new FileBlob { Name = blob, Url = $"{_blobStorage.BlobUrl}/{EContainerName.writingpictures}/{blob}" });
                     }
                 }
-                
-                    userPicture.WritingPaths.ForEach(x =>
+
+                userPicture.WritingPaths.ForEach(x =>
+                {
+                    if (Blobs.Contains(x))
                     {
-                        if (Blobs.Contains(x))
-                        {
-                           
-                        }
-                       
-                    });
-             
+
+                    }
+
+                });
+
             }
-           
+
 
             ViewBag.fileBlobs = fileBlobs;
 
@@ -122,8 +131,8 @@ namespace MT.WebApp.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddWriting( PictureWritingQueue pictureWritingQueue)
-        
+        public async Task<IActionResult> AddWriting(PictureWritingQueue pictureWritingQueue)
+
         {
             if (pictureWritingQueue.Pictures != null)
             {
@@ -151,7 +160,7 @@ namespace MT.WebApp.Controllers
             //AzQueue azQueue = new AzQueue("textimagequeue");
             // await azQueue.SendMessageAsync(jsonStringBase64);
 
-          
+
         }
     }
 }
